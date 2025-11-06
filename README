@@ -1,0 +1,89 @@
+Simple Rule Based AI Agent (No LLM)
+This project is  built using FastAPI + PostgreSQL without using any LLM
+
+
+Setup database:
+used postgresql
+    1.replace with your database name
+    2.replace with your postgresql password
+
+Table auto-creates:
+    id INTEGER AUTOINCREMENT
+    key TEXT UNIQUE
+    value TEXT unique
+
+
+Run Instructions
+1.Install dependencies
+    pip install fastapi uvicorn psycopg2 pydantic
+
+2.Start the server
+    uvicorn main:app --reload
+
+
+
+To Test the api use PostMan (http://127.0.0.1:8000/agent/read_query)or fastApi swagger Ui (http://127.0.0.1:8000/docs)
+
+POST /agent/read_query
+
+save memory:
+
+    {
+    "text": "Remember my cat name is Fluffy"
+    }
+
+
+    Response:
+
+                {
+                    "original prompt": "remember my bike's name is KTM",
+                    "Choosen tool": "memory_save",
+                    "tool_input": {
+                        "key": "bike's name",
+                        "Value": "ktm"
+                    },
+                    "response": {
+                        "key": "bike's name",
+                        "value": "ktm"
+                    }
+                }
+
+
+Reterive Memory:
+    {
+    "text": "What is my cat name?"
+    }
+
+    Response:
+
+                {
+                    "original prompt": "what is my bike's name ?",
+                    "Choosen tool": "memory_read",
+                    "tool_input": "bike's name",
+                    "response": {
+                        "key": "bike's name",
+                        "value": "ktm"
+                    }
+                }
+
+
+Calculate:
+    {
+    "text": "What is 10 plus 5"
+    }
+
+
+    Response:
+
+            {
+                "original prompt": "what is 10 plus 5",
+                "Choosen tool": "Calculator",
+                "tool_input": "what is 10 plus 5",
+                "response": {
+                    "expression": "10+5",
+                    "Result": 15
+                }
+            }
+
+
+
