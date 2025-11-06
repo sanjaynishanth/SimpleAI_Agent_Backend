@@ -23,7 +23,7 @@ def table_ensure():
 
         cur.execute("""
             create table if not exists memorydata(
-                id INTEGER SERIAL,
+                id SERIAL,
                 key text PRIMARY KEY ,
                 value text
             )
