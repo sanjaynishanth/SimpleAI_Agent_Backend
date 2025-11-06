@@ -1,6 +1,7 @@
 from database import get_connection
 import operator
 import re
+import ast
 
 #Tools to perform
 
@@ -46,40 +47,65 @@ def tool_getmemory(key:str):
 #to calculate
 
 ops = {
-    "plus": operator.add,
-    "minus": operator.sub,
-    "times": operator.mul,
-    "divided by": operator.truediv
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.Pow: operator.pow,
+    ast.USub: operator.neg
 }
+
+def safe_eval(node):
+    
+    
+    if isinstance(node, ast.Constant):  # handles numbers
+        if isinstance(node.value, (int, float)):
+            return node.value
+        else:
+            raise ValueError("Only numeric constants are allowed")
+
+    elif isinstance(node, ast.BinOp):  # binary operation (+, -, *, /, **)
+        left = safe_eval(node.left)
+        right = safe_eval(node.right)
+        op_type = type(node.op)
+        if op_type in ops:
+            return ops[op_type](left, right)
+        else:
+            raise ValueError(f"Unsupported operator: {op_type}")
+
+    elif isinstance(node, ast.UnaryOp):  # negative numbers (-5)
+        op_type = type(node.op)
+        if op_type in ops:
+            return ops[op_type](safe_eval(node.operand))
+        else:
+            raise ValueError(f"Unsupported unary operator: {op_type}")
+
+    else:
+        raise ValueError(f"Invalid or unsupported expression node: {type(node)}")
+
+
+
+
 def tool_Calculate(text:str):
     s=text.lower()
     s=s.replace("what is", "").replace("calculate", "").strip()
 
-    numbers = re.findall(r"\d+", s)
-
-
-
-    if len(numbers) < 2:
-        return {"error": "Not enough numbers"}
-
-    a, b = map(int, numbers)
-
-
-    word= None
-    for key in ops.keys():
-        if key in text:
-            word = key
-            break
-
-
-    if not word:
-        return {"error": "Unknown operator"}
+    s = (
+        s.replace("plus", "+")
+        .replace("minus", "-")
+        .replace("times", "*")
+        .replace("divided by", "/")
+        .replace("x", "*")
+    )
+    s = re.sub(r"[^0-9\+\-\*\/\.\(\)\s]", "", s)
 
     
 
     try:
-        result=ops[word](a,b)
-        return{"expression": f"{a} {word} {b}", "result": result}
+        node=ast.parse(s,mode="eval").body
+        result=safe_eval(node)
 
-    except:
-        return{"error":"Could not calculate"}
+        return{"expression":s, "result": result}
+
+    except Exception as e:
+        return{"error":f"Invalid expression:{str(e)}"}

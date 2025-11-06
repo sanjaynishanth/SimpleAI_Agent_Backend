@@ -58,7 +58,7 @@ def read_input(data: Data):
 
         if "what is my" in text or "recall" in text:
             try:
-                text=text.replace("what is my","").replace("recall","").replace("?","").strip()
+                text=text.replace("what is my","").replace("recall my","").replace("?","").strip()
                 key=text
                 resp=tool_getmemory(key)
 
@@ -85,7 +85,7 @@ def read_input(data: Data):
                 found_word=True
                 break
 
-        if found_digit and found_word:
+        if found_digit or found_word:
 
             res=tool_Calculate(text)
 

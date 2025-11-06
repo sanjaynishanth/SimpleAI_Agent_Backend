@@ -8,14 +8,15 @@ used postgresql
     2.replace with your postgresql password
 
 Table auto-creates:
-    id INTEGER AUTOINCREMENT
+    id INTEGER SERIAL
     key TEXT UNIQUE
     value TEXT unique
 
 
 Run Instructions
 1.Install dependencies
-    pip install fastapi uvicorn psycopg2 pydantic
+    pip install fastapi uvicorn psycopg2 pydantic python-dotenv
+
 
 2.Start the server
     uvicorn main:app --reload
